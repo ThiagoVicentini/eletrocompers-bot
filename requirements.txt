@@ -1,0 +1,7 @@
+aiohttp==3.7.3
+async-timeout==3.0.1
+discord.py==1.6.0
+packaging==20.7
+praw==7.1.0
+prawcore==1.5.0
+requests==2.25.0

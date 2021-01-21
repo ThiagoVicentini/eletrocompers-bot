@@ -13,17 +13,17 @@ Connects with the Reddit API and get the url of a random posts of the subreddit 
 
 ## Using the bot
 After downloading the source code you need to create a file named "secret.py" with all your tokens and keys for the APIs to work
-...
+```
 tokenTelegram="something"
 tokenReddit='something'
 tokenSteam='something'
 password="something"
-...
+```
 
 Then just execute the programa
-...
+```
 python main.py
-...
+```
 
 ## Built with
 

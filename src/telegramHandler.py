@@ -1,4 +1,5 @@
 import requests, os, json
+from pydub import AudioSegment
 from steamHandler import printOnlineFriends
 from redditHandler import subreddit
 from dotenv import load_dotenv
@@ -59,6 +60,27 @@ class telegramBot:
                     return subreddit(self.channel)
                 except Exception:
                     return 'Subreddit não encontrado!'
+
+        elif 'voice' in mensagem['message']:
+                file_id = mensagem['message']['voice']['file_id']
+                link_audio = f'{self.url_base}getFile?file_id={file_id}'
+                audio_json = requests.get(link_audio)
+                audio = json.loads(audio_json.content)['result']
+                file_path = audio['file_path']
+                audio_download_link = f'https://api.telegram.org/file/bot{self.token}/{file_path}'
+
+                audio_file = requests.get(audio_download_link)
+                audio_file_name = "audio.ogg"
+
+                open(audio_file_name, 'wb').write(audio_file.content)
+                
+                AudioSegment.from_file(audio_file_name).export("audio.wav", format="wav")
+                sound = AudioSegment.from_wav("audio.wav")
+                sound = sound.set_channels(1)
+                sound.export("audio.wav", format="wav")
+
+                return file_path
+        
         else:
             return None
 

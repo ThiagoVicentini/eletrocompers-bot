@@ -1,32 +1,37 @@
-import requests
-from secrets import tokenSteam
+import requests, os
+from dotenv import load_dotenv
 
-eletrocompers = ["Marconauta",
-                "KKDuShi",
-                "Ottselatto",
-                "Zayes",
-                "Montanari",
-                "Matheusuz",
-                "BRCOLT",
-                "SH4K3 P31D40",
-                "Selectko"]
+# Carrega o conteudo do arquivo .env
+load_dotenv()
 
-key_api = tokenSteam
-steam_id = '76561198169109577'
-    
+friends = []
+with open("friends.txt") as file:
+    friend = file.readline()
+    while friend != '':
+        friends.append(friend)
+        friend = file.readline()
+
+STEAM_KEY = None
+STEAM_ID = None
+try:
+    STEAM_KEY = os.environ["STEAM_KEY"]
+    STEAM_ID = os.environ["STEAM_ID"]
+except:
+    raise Exception("Erro ao ler o conteudo do .env")
+
 
 def printOnlineFriends():
 
-    friend_list_uri = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=' + key_api + '&steamid=' + steam_id + '&relationship=friend'
+    friend_list_uri = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=' + STEAM_KEY + '&steamid=' + STEAM_ID + '&relationship=friend'
     friend_list = requests.get(friend_list_uri).json()['friendslist']['friends']
 
-    steam_id_list = []
-    steam_id_list.append(steam_id)
+    STEAM_ID_list = []
+    STEAM_ID_list.append(STEAM_ID)
     for i in range(len(friend_list)):
-        steam_id_list.append(friend_list[i]['steamid'])
-    ids_join = ','.join(steam_id_list)
+        STEAM_ID_list.append(friend_list[i]['steamid'])
+    ids_join = ','.join(STEAM_ID_list)
 
-    profiles_uri = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + key_api + '&steamids=' + ids_join
+    profiles_uri = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + STEAM_KEY + '&steamids=' + ids_join
     profiles = requests.get(profiles_uri).json()['response']
     
     players_online_dict = {}
@@ -46,16 +51,16 @@ def printOnlineFriends():
             continue
 
     textoDiscord = ''
-    eletrocompers_count = 0
+    friends_count = 0
     for i in sorted(players_online_dict.keys()):
-        if eletrocompers.__contains__(i):
-            eletrocompers_count += 1
+        if friends.__contains__(i):
+            friends_count += 1
             tspaces = ''
             len_name_diff = ((max_namelen - len(i)) + 2)*2 + 1
             for x in range(len_name_diff):
                 tspaces += ' '
             textoDiscord += i + tspaces + "[" + players_online_dict[i] + "]" + '\n'
-    if eletrocompers_count == 0:
-        textoDiscord = 'Nenhum eletrocomper jogando :c'
+    if friends_count == 0:
+        textoDiscord = 'Ninguem jogando :c'
         
     return textoDiscord

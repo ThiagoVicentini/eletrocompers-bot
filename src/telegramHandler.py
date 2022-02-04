@@ -1,15 +1,18 @@
 import requests, os, json
-from mySteam import printOnlineFriends
+from steamHandler import printOnlineFriends
 from redditHandler import subreddit
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class telegramBot:
     def __init__(self):
-        TOKEN_TELEGRAM = None
+        TELEGRAM_KEY = None
         try:
-            TOKEN_TELEGRAM = os.environ["TELEGRAM"]
+            TELEGRAM_KEY = os.environ["TELEGRAM_KEY"]
         except:
             raise Exception("Erro ao ler o conteudo do .env")
-        self.token = TOKEN_TELEGRAM
+        self.token = TELEGRAM_KEY
         self.url_base = f'https://api.telegram.org/bot{self.token}/'
         self.channel = ""
 

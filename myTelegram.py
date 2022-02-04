@@ -1,22 +1,17 @@
-import json
-import praw
-from mySteam import printOnlineFriends as friends
-import requests
-from secrets import tokenTelegram, tokenReddit, password
-
-
-
-reddit = praw.Reddit(client_id='ZKgYtHVPcSTGzQ',
-                     client_secret=tokenReddit, 
-                     password=password,
-                     user_agent='eletrocompers',
-                     username='selectko')
+import requests, os, json
+from mySteam import printOnlineFriends
+from redditHandler import subreddit
 
 class telegramBot:
     def __init__(self):
-        token = tokenTelegram
-        self.url_base = f'https://api.telegram.org/bot{token}/'
-        self.channel = "dataisbeautiful"
+        TOKEN_TELEGRAM = None
+        try:
+            TOKEN_TELEGRAM = os.environ["TELEGRAM"]
+        except:
+            raise Exception("Erro ao ler o conteudo do .env")
+        self.token = TOKEN_TELEGRAM
+        self.url_base = f'https://api.telegram.org/bot{self.token}/'
+        self.channel = ""
 
     # Iniciar o bot
     def Iniciar(self):
@@ -51,20 +46,16 @@ class telegramBot:
             terminal = terminal.split("@")
             cmd = terminal[0]
             if cmd == '/help':
-                help = "/play => Ver amiguinhos que estão jogando\n/waifu => Uma waifu só sua\n/r@nome_subreddit => Seleciona um post aleatorio do 'nome_subreddit'\n"
+                help = "/play => Checa se os jogadores informados estão em jogo na Steam.\n\n/r@nome_subreddit => Seleciona um post aleatorio do 'nome_subreddit'\n"
                 return help
             if cmd == '/play':
-                return friends()    
-            if cmd == '/waifu':
-                submission = reddit.subreddit("CuteAnimeGirls").random()
-                return submission.url
+                return printOnlineFriends()    
             if cmd == f'/r':
                 try:
                     self.channel = terminal[1]
-                    submission = reddit.subreddit(self.channel).random()
-                    return submission.url
+                    return subreddit(self.channel)
                 except Exception:
-                    return 'Não existe essa poha seu corno!'
+                    return 'Subreddit não encontrado!'
         else:
             return None
 
